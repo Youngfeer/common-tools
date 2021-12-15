@@ -36,4 +36,19 @@ public class DataSourceConfig {
             @Qualifier("mesfDataSource") DataSource dataSource){
         return new JdbcTemplate(dataSource);
     }
+
+
+    @Bean(name = "commodityDataSource")
+    @Qualifier("commodityDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.commodity")
+    public DataSource commodityDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean(name = "commodityJdbcTemplate")
+    public JdbcTemplate commodityJdbcTemplate(
+            @Qualifier("commodityDataSource") DataSource dataSource){
+        return new JdbcTemplate(dataSource);
+    }
+
 }

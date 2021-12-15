@@ -28,6 +28,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResult getOrderInfo(String orderNo) throws Exception {
+        OrderResponse orderResponse = new OrderResponse();
         long item_slot =  ShardingUtil.indexSlotWithHash(orderNo);
         String table = "business_order_item_" + item_slot;
         String sql = "select sale_to_user_code from " + table + " where order_no = " + "\"" + orderNo + "\"";
@@ -42,13 +43,14 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         String sql2 = "select org_office_name from sf_verify_basic_info where verify_cust_code = " +  "\"" + dealerCode + "\"";
-        String orgName = mesfJdbcTemplate.queryForList(sql2, String.class).get(0);
-        OrderResponse orderResponse = new OrderResponse();
+        if(mesfJdbcTemplate.queryForList(sql2, String.class).size() > 0) {
+            String orgName = mesfJdbcTemplate.queryForList(sql2, String.class).get(0);
+            orderResponse.setOrgName(orgName);
+        }
         orderResponse.setActivityIds(activityIds);
         orderResponse.setDealerCode(dealerCode);
         orderResponse.setItemNo(String.valueOf(item_slot));
         orderResponse.setMainNo(String.valueOf(item));
-        orderResponse.setOrgName(orgName);
         OrderResult orderResult = new OrderResult();
         orderResult.setData(orderResponse);
         orderResult.setSuccess(true);
